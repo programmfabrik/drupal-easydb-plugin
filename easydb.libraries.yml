@@ -1,0 +1,6 @@
+easydbAdapter:
+  js:
+    js/easydbAdapter.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings

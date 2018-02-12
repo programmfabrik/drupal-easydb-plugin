@@ -1,0 +1,14 @@
+label: 'easydb-Browser'
+display_configuration:
+  link_text: 'Dateien auswählen'
+selection_display_configuration:
+  select_text: 'Ausgewählte übernehmen'
+widgets:
+  d08f4f8c-3a47-4d52-b81a-37de55633f5f:
+    label: 'Von easydb kopieren'
+    settings:
+      submit_text: 'Dateien auswählen'
+  27f4d1ff-98ff-4031-9946-50f26bd71884:
+    label: 'Dateiliste'
+    settings:
+      submit_text: 'Dateien auswählen'

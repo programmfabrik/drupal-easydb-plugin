@@ -1,0 +1,6 @@
+easydb.admin:
+  title: 'easydb'
+  description: 'Configure the easydb connection.'
+  parent: system.admin_config_media
+  route_name: easydb.settings
+  weight: 100

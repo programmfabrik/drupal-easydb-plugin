@@ -1,0 +1,89 @@
+# Translation template for the easydb File Picker module
+
+# easydb.install
+
+msgid 'You installed the easydb File Picker module. Before you can use it, you need to set up the URL of your easydb server and the language mapping on the module configuration page. You may also want to adjust the permissions on the permissions page.'
+msgstr ''
+
+# src/Controller/ImportFilesController.php
+
+msgid 'Failed to create %dir. Check the easydb module\'s settings ("easydb files sub-directory") and the permissions in your file system.'
+msgstr ''
+
+msgid 'The Content-Type header of the POST request isn\'t "multipart/form-data" as expected.'
+msgstr ''
+
+msgid 'Filename inconsistent: filename promised by JSON data differs from the one delivered by POST files.'
+msgstr ''
+
+msgid 'Download URL missing.'
+msgstr ''
+
+msgid 'Exception while using file_get_contents() with the download URL.'
+msgstr ''
+
+msgid 'Couldn\'t save file in Drupal\'s file system.'
+msgstr ''
+
+msgid 'The easydb images couldn\'t be imported because no easydb language is mapped to this site\'s language(s). Please check the language mapping section on the <a href=":settings_url">easydb settings page</a>.'
+msgstr ''
+
+msgid 'Couldn\'t import images because of missing language mapping.'
+msgstr ''
+
+# src/Element/EasydbFile.php
+
+msgid 'You don\'t have the permission to use the easydb file picker.'
+msgstr ''
+
+msgid 'Couldn\'t retrieve the entity browser\'s instance uuid.'
+msgstr ''
+
+msgid 'Refresh'
+msgstr ''
+
+msgid 'Fetch from easydb'
+msgstr ''
+
+msgid 'Remove selected'
+msgstr ''
+
+msgid 'Remove'
+msgstr ''
+
+# src/Form/EasydbSettingsForm.php
+
+msgid 'easydb server URL'
+msgstr ''
+
+msgid 'The URL of the easydb server, including "http://" or "https://".'
+msgstr ''
+
+msgid 'easydb files sub-directory'
+msgstr ''
+
+msgid 'The sub-directory where the files from easydb will be stored, e.g. "easydb". I.e. the files will be stored in sites/default/files/<em>sub-directory</em> and thus will have a file URL like "http://example.org/sites/default/files/<em>sub-directory</em>/filename.jpg". Leave it empty to store the easydb files among all others in the files directory.'
+msgstr ''
+
+msgid 'Use easydb\'s @easydb_langcode translation.'
+msgstr ''
+
+msgid 'Language mapping'
+msgstr ''
+
+msgid 'For each language configured on this Drupal site, you can choose which of the languages of easydb should be used. Alternatively, you can choose to not create a media entity translation in this language.'
+msgstr ''
+
+msgid 'Don\'t create a translation in this language.'
+msgstr ''
+
+# src/Plugin/EntityBrowser/Widget/Easydb.php
+
+msgid 'Allowed extensions'
+msgstr ''
+
+msgid 'You don\'t have media bundle of the Image type. You should <a href='!link'>create one</a>'
+msgstr ''
+
+msgid 'Media bundle'
+msgstr ''

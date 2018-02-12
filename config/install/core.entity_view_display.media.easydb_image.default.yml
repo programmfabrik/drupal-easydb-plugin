@@ -1,0 +1,86 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.easydb_image.field_easydb_caption
+    - field.field.media.easydb_image.field_easydb_copyright
+    - field.field.media.easydb_image.field_easydb_description
+    - field.field.media.easydb_image.field_easydb_keywords
+    - field.field.media.easydb_image.field_easydb_title
+    - field.field.media.easydb_image.field_easydb_uid
+    - field.field.media.easydb_image.field_media_image
+    - media.type.easydb_image
+  module:
+    - image
+    - user
+id: media.easydb_image.default
+targetEntityType: media
+bundle: easydb_image
+mode: default
+content:
+  created:
+    label: hidden
+    type: timestamp
+    weight: 7
+    region: content
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+  field_easydb_caption:
+    weight: 3
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_easydb_copyright:
+    weight: 5
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_easydb_description:
+    weight: 2
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_easydb_keywords:
+    weight: 4
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_easydb_title:
+    weight: 0
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_media_image:
+    label: above
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    weight: 1
+    region: content
+  uid:
+    label: hidden
+    type: author
+    weight: 6
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_easydb_uid: true
+  thumbnail: true

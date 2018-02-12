@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+  enforced:
+    module:
+      - easydb
+id: media.thumbnail
+label: Thumbnail
+targetEntityType: media
+cache: true

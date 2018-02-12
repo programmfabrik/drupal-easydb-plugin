@@ -1,0 +1,16 @@
+easydb.settings:
+  path: '/admin/config/media/easydb'
+  defaults:
+    _form: 'Drupal\easydb\Form\EasydbSettingsForm'
+    _title: 'easydb settings'
+  requirements:
+    _permission: 'administer easydb'
+
+easydb.import:
+  path: '/easydb/import/{eb_uuid}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\easydb\Controller\ImportFilesController::handle_request'
+  requirements:
+    _access: 'TRUE'
+    eb_uuid: '^[0-9a-f]+$'

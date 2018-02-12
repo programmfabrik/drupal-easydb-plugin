@@ -1,0 +1,9 @@
+name: easydb Example
+description: 'Example content type for the easydb File Picker module.'
+type: module
+package: Media
+core: 8.x
+
+dependencies:
+  - drupal:menu_ui
+  - easydb:easydb

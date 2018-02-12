@@ -1,0 +1,95 @@
+# German translation of the easydb File Picker module
+
+msgid ""
+msgstr ""
+"Project-Id-Version: easydb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+
+# easydb.install
+
+msgid 'You installed the easydb File Picker module. Before you can use it, you need to set up the URL of your easydb server and the language mapping on the module configuration page. You may also want to adjust the permissions on the permissions page.'
+msgstr 'Sie haben das easydb-File-Picker-Modul installiert. Bevor Sie es benutzen können, müssen Sie die URL Ihres easydb-Servers und die Sprachzuordnung in den Modul-Einstellungen festlegen. Außerdem können Sie die Berechtigungen anpassen.'
+
+# src/Controller/ImportFilesController.php
+
+msgid 'Failed to create %dir. Check the easydb module\'s settings ("easydb files sub-directory") and the permissions in your file system.'
+msgstr 'Konnte Verzeichnis %dir nicht anlegen. Prüfen Sie die easydb-Modul-Einstellungen ("easydb-Datei-Unterverzeichnis") und die Berechtigungen in Ihrem Dateisystem.'
+
+msgid 'The Content-Type header of the POST request isn\'t "multipart/form-data" as expected.'
+msgstr 'Der "Content-Type"-Header der POST-Anfrage ist nicht "multipart/form-data" wie erwartet.'
+
+msgid 'Filename inconsistent: filename promised by JSON data differs from the one delivered by POST files.'
+msgstr 'Inkonsistenter Dateiname: Der in den JSON-Daten angekündigte Dateiname unterscheidet sich von dem in den POST-Dateien gelieferten.'
+
+msgid 'Download URL missing.'
+msgstr 'Download-URL fehlt.'
+
+msgid 'Exception while using file_get_contents() with the download URL.'
+msgstr 'Exception beim Benutzen von file_get_contents() mt der Download-URL.'
+
+msgid 'Couldn\'t save file in Drupal\'s file system.'
+msgstr 'Konnte die Datei nicht in Drupals Dateisystem speichern.'
+
+msgid 'The easydb images couldn\'t be imported because no easydb language is mapped to this site\'s language(s). Please check the language mapping section on the <a href=":settings_url">easydb settings page</a>.'
+msgstr 'Die easydb-Bilder konnten nicht importiert werden, da keine easydb-Sprache zur Sprache dieser Seite zugeordnet ist. Bitte überprüfen Sie den Abschnitt Sprachzuordnung auf der <a href=":settings_url">easydb-Konfigurations-Seite</a>.'
+
+msgid 'Couldn\'t import images because of missing language mapping.'
+msgstr 'Konnte Bilder wegen fehlender Sprachzuordnung nicht importieren.'
+
+# src/Element/EasydbFile.php
+
+msgid 'You don\'t have the permission to use the easydb file picker.'
+msgstr 'Sie haben nicht die Berechtigung, den easydb-File-Picker zu benutzen.'
+
+msgid 'Couldn\'t retrieve the entity browser\'s instance uuid.'
+msgstr 'Konnte die "instance uuid" des Entity-Browsers nicht bekommen.'
+
+msgid 'Refresh'
+msgstr 'Aktualisieren'
+
+msgid 'Fetch from easydb'
+msgstr 'Von easydb holen'
+
+msgid 'Remove selected'
+msgstr 'Ausgewählte entfernen'
+
+msgid 'Remove'
+msgstr 'Entfernen'
+
+# src/Form/EasydbSettingsForm.php
+
+msgid 'easydb server URL'
+msgstr 'easydb-Server-URL'
+
+msgid 'The URL of the easydb server, including "http://" or "https://".'
+msgstr 'Die URL des easydb-Servers, einschließlich "http://" oder "https://".'
+
+msgid 'easydb files sub-directory'
+msgstr 'easydb-Datei-Unterverzeichnis'
+
+msgid 'The sub-directory where the files from easydb will be stored, e.g. "easydb". I.e. the files will be stored in sites/default/files/<em>sub-directory</em> and thus will have a file URL like "http://example.org/sites/default/files/<em>sub-directory</em>/filename.jpg". Leave it empty to store the easydb files among all others in the files directory.'
+msgstr 'Das Unterverzeichnis, in dem die Dateien von easydb gespeichert werden sollen, z.B. "easydb". D.h. die Dateien werden in sites/default/files/<em>Unterverzeichnis</em> gespeichert und haben daher eine Datei-URL der Form "http://example.org/sites/default/files/<em>Unterverzeichnis</em>/Dateiname.jpg". Leer lassen, um die easydb-Dateien zusammen mit allen anderen im allgemeinen Datei-Verzeichnis zu speichern.'
+
+msgid 'Use easydb\'s @easydb_langcode translation.'
+msgstr 'easydbs Übersetzung @easydb_langcode benutzen.'
+
+msgid 'Language mapping'
+msgstr 'Sprachzuordnung'
+
+msgid 'For each language configured on this Drupal site, you can choose which of the languages of easydb should be used. Alternatively, you can choose to not create a media entity translation in this language.'
+msgstr 'Für jede auf dieser Drupal-Seite eingerichtete Sprache können Sie wählen, welche der Sprachen von easydb benutzt werden soll. Alternativ können Sie wählen, keine Übersetzung der Medienentität in dieser Sprache anzulegen.'
+
+msgid 'Don\'t create a translation in this language.'
+msgstr 'Keine Übersetzung in dieser Sprache anlegen.'
+
+# src/Plugin/EntityBrowser/Widget/Easydb.php
+
+msgid 'Allowed extensions'
+msgstr 'Erlaubte Dateiendungen'
+
+msgid 'You don\'t have media bundle of the Image type. You should <a href='!link'>create one</a>'
+msgstr 'Sie haben kein Medien-Bundle vom Typ Bild. Sie sollten <a href='!link'>eins anlegen</a>.'
+
+msgid 'Media bundle'
+msgstr 'Medien-Bundle'

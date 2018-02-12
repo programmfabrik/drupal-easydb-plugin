@@ -1,0 +1,40 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.thumbnail
+    - field.field.media.easydb_image.field_easydb_caption
+    - field.field.media.easydb_image.field_easydb_copyright
+    - field.field.media.easydb_image.field_easydb_description
+    - field.field.media.easydb_image.field_easydb_keywords
+    - field.field.media.easydb_image.field_easydb_title
+    - field.field.media.easydb_image.field_easydb_uid
+    - field.field.media.easydb_image.field_media_image
+    - image.style.thumbnail
+    - media.type.easydb_image
+  module:
+    - image
+id: media.easydb_image.thumbnail
+targetEntityType: media
+bundle: easydb_image
+mode: thumbnail
+content:
+  thumbnail:
+    type: image
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      image_style: thumbnail
+      image_link: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  field_easydb_caption: true
+  field_easydb_copyright: true
+  field_easydb_description: true
+  field_easydb_keywords: true
+  field_easydb_title: true
+  field_easydb_uid: true
+  field_media_image: true
+  uid: true

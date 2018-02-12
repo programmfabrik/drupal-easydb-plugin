@@ -1,0 +1,51 @@
+langcode: und
+status: true
+dependencies:
+  config:
+    - views.view.easydb_entity_browser
+  module:
+    - easydb
+    - views
+  enforced:
+    module:
+      - easydb
+name: easydb_entity_browser
+label: 'easydb Browser'
+display: iframe
+display_configuration:
+  width: '650'
+  height: '500'
+  link_text: 'Select files'
+  auto_open: true
+selection_display: multi_step_display
+selection_display_configuration:
+  entity_type: media
+  display: rendered_entity
+  display_settings:
+    view_mode: thumbnail
+  select_text: 'Use selected'
+  selection_hidden: false
+widget_selector: tabs
+widget_selector_configuration: {  }
+widgets:
+  d08f4f8c-3a47-4d52-b81a-37de55633f5f:
+    settings:
+      extensions: 'jpg jpeg png gif'
+      media_type: easydb_image
+      upload_location: 'public://'
+      multiple: '1'
+      submit_text: 'Select files'
+    uuid: d08f4f8c-3a47-4d52-b81a-37de55633f5f
+    weight: 1
+    label: 'Copy from easydb'
+    id: easydb_copy
+  27f4d1ff-98ff-4031-9946-50f26bd71884:
+    settings:
+      view: easydb_entity_browser
+      view_display: entity_browser_1
+      submit_text: 'Select files'
+      auto_select: false
+    uuid: 27f4d1ff-98ff-4031-9946-50f26bd71884
+    weight: 2
+    label: 'Files Listing'
+    id: view

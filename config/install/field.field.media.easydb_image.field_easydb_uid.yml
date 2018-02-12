@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_easydb_uid
+    - media.type.easydb_image
+id: media.easydb_image.field_easydb_uid
+field_name: field_easydb_uid
+entity_type: media
+bundle: easydb_image
+label: 'easydb UID'
+description: 'The UID in easydb. <strong>Don''t change this value manually.</strong>'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
