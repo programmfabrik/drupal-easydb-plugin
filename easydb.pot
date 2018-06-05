@@ -22,6 +22,15 @@ msgstr ''
 msgid 'Exception while using file_get_contents() with the download URL.'
 msgstr ''
 
+msgid 'The easydb images couldn\'t be fetched. The easydb server might be unreachable by the Drupal server and activating the "Send file via browser" option for Drupal in your easydb server\'s configuration might help.'
+msgstr ''
+
+msgid 'A curl error occured: The easydb images couldn\'t be fetched.'
+msgstr ''
+
+msgid 'A curl error occured when trying to fetch another image before.'
+msgstr ''
+
 msgid 'Couldn\'t save file in Drupal\'s file system.'
 msgstr ''
 

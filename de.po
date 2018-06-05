@@ -28,6 +28,15 @@ msgstr 'Download-URL fehlt.'
 msgid 'Exception while using file_get_contents() with the download URL.'
 msgstr 'Exception beim Benutzen von file_get_contents() mt der Download-URL.'
 
+msgid 'The easydb images couldn\'t be fetched. The easydb server might be unreachable by the Drupal server and activating the "Send file via browser" option for Drupal in your easydb server\'s configuration might help.'
+msgstr 'Die Bilder konnten nicht von easydb geholt werden. Der easydb-Server ist möglicherweise nicht vom Drupal-Server aus erreichbar und das Ankreuzen von "Dateien über den Browser versenden" in der Konfiguration Ihres easydb-Servers könnte helfen.'
+
+msgid 'A curl error occured: The easydb images couldn\'t be fetched.'
+msgstr 'Curl-Fehler: Die Bilder konnten nicht von easydb geholt werden.'
+
+msgid 'A curl error occured when trying to fetch another image before.'
+msgstr 'Curl-Fehler beim Holen der vorherigen Bilder aufgetreten.'
+
 msgid 'Couldn\'t save file in Drupal\'s file system.'
 msgstr 'Konnte die Datei nicht in Drupals Dateisystem speichern.'
 

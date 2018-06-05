@@ -148,7 +148,7 @@ class EasydbFile extends ManagedFile {
     // Use default values if $window_preferences isn't set yet.
     $window_preferences += ['width' => 650, 'height' => 600];
     $element['easydb_button']['#attached']['drupalSettings']['easydb'] = [
-      'easydb_url' => $easydb_server . '?typo3filepicker=' . rawurlencode(base64_encode(json_encode($short_config))),  // TODO '?drupalfilepicker='
+      'easydb_url' => $easydb_server . '?drupalfilepicker=' . rawurlencode(base64_encode(json_encode($short_config))),
       'easydb_server' => $easydb_server,
       'config' => rawurlencode(base64_encode(json_encode($full_config))),
       // Not smaller than 100 px.

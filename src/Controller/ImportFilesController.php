@@ -9,6 +9,7 @@ namespace Drupal\easydb\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use Drupal\user\PrivateTempStoreFactory;
@@ -91,15 +92,34 @@ class ImportFilesController extends ControllerBase {
     }
 
     $response_files = [];
+    $media_entities = [];
+    $curl_error_occured = FALSE;
     foreach ($easydb_data['files'] as $file_metadata) {
-      $response_this_file = $this->handle_file($file_metadata, $easydb_data['send_data'], $uri_base, $request->headers->get('Content-Type'));
-      $response_files[] = $response_this_file;
-      if (isset($response_this_file['resourceid'])) {
-        $media_entities[] = $response_this_file['resourceid'];
+      // If a curl error occured before, we assume that the connection/download
+      // won't work for this image either.
+      if ($curl_error_occured) {
+        $response_this_file = [
+          'uid' => $file_metadata['uid'],
+        ];
+        $this->set_error(
+          $response_this_file,
+          'error.drupal.curl',
+          $this->t('A curl error occured when trying to fetch another image before.')
+        );
+      }
+      else {  // if no curl error occured
+        $response_this_file = $this->handle_file($file_metadata, $easydb_data['send_data'], $uri_base, $request->headers->get('Content-Type'));
+        $response_files[] = $response_this_file;
+        if (isset($response_this_file['error']) && $response_this_file['error']['code'] == 'error.drupal.curl') {
+          $curl_error_occured = TRUE;
+        }
+        if (isset($response_this_file['resourceid'])) {
+          $media_entities[] = $response_this_file['resourceid'];
+        }
       }
     }
 
-    // Save the window_preferences to the Drupal user.data system
+    // Save the window_preferences to the Drupal user.data system.
     $wp_width = $easydb_data['window_preferences']['width'];
     $wp_height = $easydb_data['window_preferences']['height'];
     // Check if width and height exist and are numbers
@@ -151,33 +171,72 @@ class ImportFilesController extends ControllerBase {
     if ($send_data) {
       // Proceed only if Content-Type header is multipart/form-data.
       if (strpos($request_content_type, 'multipart/form-data;') !== 0) {
-        $this->set_error($response_this_file, 'error.drupal.not_multipart_form_data', $this->t('The Content-Type header of the POST request isn\'t "multipart/form-data" as expected.'), ['content_type' => $request_content_type]);
+        $this->set_error(
+          $response_this_file,
+          'error.drupal.not_multipart_form_data',
+          $this->t('The Content-Type header of the POST request isn\'t "multipart/form-data" as expected.'),
+          ['content_type' => $request_content_type]
+        );
         return $response_this_file;
       }
       // Proceed only if the actual POST ($_FILES) file name equals the file
       // name in the easydb metadata.
       if (!empty($_FILES['files']['name'][0]) && $_FILES['files']['name'][0] != $file_metadata['filename']) {
-        $this->set_error($response_this_file, 'error.drupal.filename_inconsistent', $this->t('Filename inconsistent: filename promised by JSON data differs from the one delivered by POST files.'), [
-          'filename_json' => $file_metadata['filename'],
-          'filename_post' => $_FILES['files']['name'][0],
-        ]);
+        $this->set_error(
+          $response_this_file,
+          'error.drupal.filename_inconsistent',
+          $this->t('Filename inconsistent: filename promised by JSON data differs from the one delivered by POST files.'),
+          [
+            'filename_json' => $file_metadata['filename'],
+            'filename_post' => $_FILES['files']['name'][0],
+          ]
+        );
         return $response_this_file;
       }
-      $source_filename = $_FILES['files']['tmp_name'][0];
+      try {
+        $file_data = file_get_contents($_FILES['files']['tmp_name'][0]);
+      }
+      catch (\Exception $e) {
+        $this->set_error(
+          $response_this_file,
+          'error.drupal.file_get_contents',
+          $this->t('Exception while using file_get_contents() with the download URL.'),
+          ['message' => $e->getMessage()]
+        );
+      }
     }
     else {  // if not $send_data
       // Proceed only if there is a URL
-      if (empty($file_metadata['url'])) {
-        $this->set_error($response_this_file, 'error.drupal.no_url', $this->t('Download URL missing.'));
+      if (!array_key_exists('url', $file_metadata) || empty($file_metadata['url'])) {
+        $this->set_error(
+          $response_this_file,
+          'error.drupal.no_url',
+          $this->t('Download URL missing.')
+        );
         return $response_this_file;
       }
-      $source_filename = $file_metadata['url'];
-    }
-    try {
-      $file_data = file_get_contents($source_filename);
-    }
-    catch (\Exception $e) {
-      $this->set_error($response_this_file, 'error.drupal.file_get_contents', $this->t('Exception while using file_get_contents() with the download URL.'), ['message' => $e->getMessage()]);
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $file_metadata['url']);
+      curl_setopt($ch, CURLOPT_HEADER, 0);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+      $file_data = curl_exec($ch);
+      // Proceed only if the server is reachable (connect within 5 seconds)
+      if (curl_errno($ch)) {
+        drupal_set_message($this->t('The easydb images couldn\'t be fetched. The easydb server might be unreachable by the Drupal server and activating the "Send file via browser" option for Drupal in your easydb server\'s configuration might help.'), 'error');
+        $this->set_error(
+          $response_this_file,
+          'error.drupal.curl',
+          $this->t('A curl error occured: The easydb images couldn\'t be fetched.'),
+          [
+            'curl error code' => curl_errno($ch),
+            'curl error message' => curl_error($ch),
+          ]
+        );
+        curl_close($ch);
+        return $response_this_file;
+      }
+      curl_close($ch);
     }
     // Check for existing media entities with this easydb UID; there should be
     // only one or none, so all "foreach ($existing_media_entities ..." loops
@@ -197,7 +256,11 @@ class ImportFilesController extends ControllerBase {
     $file = file_save_data($file_data, $uri, FILE_EXISTS_RENAME);
     // Proceed only if saving the file was successful.
     if ($file === FALSE) {
-      $this->set_error($response_this_file, 'error.drupal.file_save', $this->t('Couldn\'t save file in Drupal\'s file system.'));
+      $this->set_error(
+        $response_this_file,
+        'error.drupal.file_save',
+        $this->t('Couldn\'t save file in Drupal\'s file system.')
+      );
       return $response_this_file;
     }
     // Get the language_mapping from the easydb.settings config but the keys
@@ -214,7 +277,11 @@ class ImportFilesController extends ControllerBase {
     // language decisions.
     if (empty($language_mapping)) {
       drupal_set_message($this->t('The easydb images couldn\'t be imported because no easydb language is mapped to this site\'s language(s). Please check the language mapping section on the <a href=":settings_url">easydb settings page</a>.', [':settings_url' => Url::fromRoute('easydb.settings')->toString()]), 'error');
-      $this->set_error($response_this_file, 'error.drupal.language_mapping', $this->t('Couldn\'t import images because of missing language mapping.'));
+      $this->set_error(
+        $response_this_file,
+        'error.drupal.language_mapping',
+        $this->t('Couldn\'t import images because of missing language mapping.')
+      );
       return $response_this_file;
     }
     // $ent_values stores the media entity values for the different languages
