@@ -1,23 +1,19 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\easydb\EasydbCors.
- *
- * Adds the easydb server URL from the config to the CORS allowed origins.
- */
-
 namespace Drupal\easydb;
 
 use Asm89\Stack\Cors;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+/**
+ * Adds the easydb server URL from the module settings to the Allowed Origins.
+ */
 class EasydbCors extends Cors {
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(HttpKernelInterface $app, array $options = array()) {
+  public function __construct(HttpKernelInterface $app, array $options = []) {
     // Use the easydb_server_url value from the config, remove the trailing
     // slash and any possible path after the domain, and append this to the
     // allowed origins.

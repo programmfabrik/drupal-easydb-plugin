@@ -5,15 +5,14 @@
  * Installation functions for easydb module.
  */
 
-use Drupal\Core\Url;
-
 /**
  * Implements hook_install().
  *
  * Points the user to the settings and permissions page after installation.
  */
 function easydb_install() {
-  // Route "easydb.settings" seems to be not available yet when hook_install() runs, so we can't link to Url::fromRoute('easydb.settings') here.
+  // Route "easydb.settings" seems to be not available yet when hook_install()
+  // runs, so we can't link to Url::fromRoute('easydb.settings') here.
   $message = t('You installed the easydb File Picker module. Before you can use it, you need to set up the URL of your easydb server and the language mapping on the module configuration page. You may also want to adjust the permissions on the permissions page.');
   drupal_set_message($message, 'warning');
 }

@@ -1,23 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\easydb\Element\EasydbFile.
- */
-
 namespace Drupal\easydb\Element;
 
 use Drupal\file\Element\ManagedFile;
-use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
-use Drupal\file\Entity\File;
-use Symfony\Component\HttpFoundation\Request;
 use Drupal\media\Entity\Media;
 
 /**
@@ -78,7 +66,7 @@ class EasydbFile extends ManagedFile {
     // Set some default element properties.
     $element['#progress_indicator'] = empty($element['#progress_indicator']) ? 'none' : $element['#progress_indicator'];
     $element['#tree'] = TRUE;
-    // Load the media entities which will be rendered later
+    // Load the media entities which will be rendered later.
     $element['#media_entities'] = !empty($mids) ? Media::loadMultiple($mids) : FALSE;
 
     // Generate a unique wrapper HTML ID.
@@ -117,7 +105,8 @@ class EasydbFile extends ManagedFile {
       '#type' => 'submit',
       '#value' => t('Fetch from easydb'),
       '#validate' => [],
-      '#submit' => [],  // No regular submit-handler. This form only works via JavaScript.
+      // No regular submit-handler. This form only works via JavaScript.
+      '#submit' => [],
       '#weight' => 1,
       '#attributes' => [
         'onclick' => 'easydbAdapter.openPicker(this.event); return false;',

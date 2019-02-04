@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\easydb\Controller\ImportFilesController.
- */
-
 namespace Drupal\easydb\Controller;
 
 use Drupal\Component\Serialization\Json;
@@ -18,6 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Creates a controller to receive files and metadata from the easydb server.
+ */
 class ImportFilesController extends ControllerBase {
 
   /**
@@ -32,14 +30,14 @@ class ImportFilesController extends ControllerBase {
    *
    * @var \Drupal\user\UserDataInterface
    */
-  protected $user_data;
+  protected $userData;
 
   /**
    * Constructs the ImportFilesController.
    */
   public function __construct(PrivateTempStoreFactory $temp_store_factory, UserDataInterface $user_data) {
     $this->tempstore = $temp_store_factory->get('easydb');
-    $this->user_data = $user_data;
+    $this->userData = $user_data;
   }
 
   /**
@@ -61,12 +59,16 @@ class ImportFilesController extends ControllerBase {
    * request to the Drupal browser window it originates from. See
    * easydb.routing.yml and EasydbFile::processManagedFile().
    *
-   * @param Request $request The request object.
-   * @param string $eb_uuid The entity browser uuid which is used as a token.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param string $eb_uuid
+   *   The entity browser uuid which is used as a token.
    *
-   * @return A JsonResponse containing 'took' (the time to process the request) and 'files' (an array of feedback data about the file ingestion).
+   * @return \Drupal\Component\Serialization\JsonResponse
+   *   A JsonResponse containing 'took' (the time to process the request) and
+   *   'files' (an array of feedback data about the file ingestion).
    */
-  public function handle_request(Request $request, $eb_uuid) {
+  public function handleRequest(Request $request, $eb_uuid) {
     $user_id = \Drupal::currentUser()->id();
     // Check if user is authenticated (because we need the user's tempstore and
     // user.data) and if the eb_uuid (the token) is valid, i.e. $eb_uuid is in
@@ -87,7 +89,8 @@ class ImportFilesController extends ControllerBase {
         drupal_set_message($description, 'error');
       }
     }
-    else {  // if $subdir is empty
+    // If $subdir is empty.
+    else {
       $uri_base = 'public://';
     }
 
@@ -101,14 +104,15 @@ class ImportFilesController extends ControllerBase {
         $response_this_file = [
           'uid' => $file_metadata['uid'],
         ];
-        $this->set_error(
+        $this->setError(
           $response_this_file,
           'error.drupal.curl',
           $this->t('A curl error occured when trying to fetch another image before.')
         );
       }
-      else {  // if no curl error occured
-        $response_this_file = $this->handle_file($file_metadata, $easydb_data['send_data'], $uri_base, $request->headers->get('Content-Type'));
+      // If no curl error occured.
+      else {
+        $response_this_file = $this->handleFile($file_metadata, $easydb_data['send_data'], $uri_base, $request->headers->get('Content-Type'));
         $response_files[] = $response_this_file;
         if (isset($response_this_file['error']) && $response_this_file['error']['code'] == 'error.drupal.curl') {
           $curl_error_occured = TRUE;
@@ -122,9 +126,9 @@ class ImportFilesController extends ControllerBase {
     // Save the window_preferences to the Drupal user.data system.
     $wp_width = $easydb_data['window_preferences']['width'];
     $wp_height = $easydb_data['window_preferences']['height'];
-    // Check if width and height exist and are numbers
+    // Check if width and height exist and are numbers.
     if (isset($wp_width, $wp_height) && is_int($wp_width) && is_int($wp_height)) {
-      $this->user_data->set('easydb', $user_id, 'window_preferences', ['width' => $wp_width, 'height' => $wp_height]);
+      $this->userData->set('easydb', $user_id, 'window_preferences', ['width' => $wp_width, 'height' => $wp_height]);
     }
 
     // Load and add the already copied media entities in case the "copy from
@@ -151,19 +155,25 @@ class ImportFilesController extends ControllerBase {
    * with the same easydb UID already exists, it's changed/updated (including
    * its translations) instead of creating a new one.
    *
-   * @param array $file_metadata The metadata array from easydb.
-   * @param bool $send_data Whether or not the file is sent within the POST request.
-   * @param string $uri_base The directory where to save the file.
-   * @param string $request_content_type The "Content-Type" header of the request if given.
+   * @param array $file_metadata
+   *   The metadata array from easydb.
+   * @param bool $send_data
+   *   Whether or not the file is sent within the POST request.
+   * @param string $uri_base
+   *   The directory where to save the file.
+   * @param string $request_content_type
+   *   The "Content-Type" header of the request if given.
    *
-   * @return An array of feedback data for easydb about the file ingestion.
+   * @return array
+   *   An array of feedback data for easydb about the file ingestion.
    */
-  protected function handle_file(array &$file_metadata, $send_data, $uri_base, $request_content_type) {
+  protected function handleFile(array &$file_metadata, $send_data, $uri_base, $request_content_type) {
     $response_this_file = [
       'uid' => $file_metadata['uid'],
     ];
     if (!empty($file_metadata['filename'])) {
-      $uri =  $uri_base . file_munge_filename($file_metadata['filename'], 'jpg png gif');  // the intended file name
+      // The intended file name.
+      $uri = $uri_base . file_munge_filename($file_metadata['filename'], 'jpg png gif');
     }
     else {
       $uri = $uri_base . 'file';
@@ -171,7 +181,7 @@ class ImportFilesController extends ControllerBase {
     if ($send_data) {
       // Proceed only if Content-Type header is multipart/form-data.
       if (strpos($request_content_type, 'multipart/form-data;') !== 0) {
-        $this->set_error(
+        $this->setError(
           $response_this_file,
           'error.drupal.not_multipart_form_data',
           $this->t('The Content-Type header of the POST request isn\'t "multipart/form-data" as expected.'),
@@ -182,7 +192,7 @@ class ImportFilesController extends ControllerBase {
       // Proceed only if the actual POST ($_FILES) file name equals the file
       // name in the easydb metadata.
       if (!empty($_FILES['files']['name'][0]) && $_FILES['files']['name'][0] != $file_metadata['filename']) {
-        $this->set_error(
+        $this->setError(
           $response_this_file,
           'error.drupal.filename_inconsistent',
           $this->t('Filename inconsistent: filename promised by JSON data differs from the one delivered by POST files.'),
@@ -197,7 +207,7 @@ class ImportFilesController extends ControllerBase {
         $file_data = file_get_contents($_FILES['files']['tmp_name'][0]);
       }
       catch (\Exception $e) {
-        $this->set_error(
+        $this->setError(
           $response_this_file,
           'error.drupal.file_get_contents',
           $this->t('Exception while using file_get_contents() with the download URL.'),
@@ -205,10 +215,11 @@ class ImportFilesController extends ControllerBase {
         );
       }
     }
-    else {  // if not $send_data
-      // Proceed only if there is a URL
+    // If not $send_data.
+    else {
+      // Proceed only if there is a URL.
       if (!array_key_exists('url', $file_metadata) || empty($file_metadata['url'])) {
-        $this->set_error(
+        $this->setError(
           $response_this_file,
           'error.drupal.no_url',
           $this->t('Download URL missing.')
@@ -216,15 +227,17 @@ class ImportFilesController extends ControllerBase {
         return $response_this_file;
       }
       $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $file_metadata['url']);
+      // The URL shouldn't contain spaces.
+      curl_setopt($ch, CURLOPT_URL, str_replace(' ', '%20', $file_metadata['url']));
       curl_setopt($ch, CURLOPT_HEADER, 0);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
       $file_data = curl_exec($ch);
-      // Proceed only if the server is reachable (connect within 5 seconds)
+      // Proceed only if the server is reachable (connect within 5 seconds).
+      // @todo Could also "check curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200".
       if (curl_errno($ch)) {
         drupal_set_message($this->t('The easydb images couldn\'t be fetched. The easydb server might be unreachable by the Drupal server and activating the "Send file via browser" option for Drupal in your easydb server\'s configuration might help.'), 'error');
-        $this->set_error(
+        $this->setError(
           $response_this_file,
           'error.drupal.curl',
           $this->t('A curl error occured: The easydb images couldn\'t be fetched.'),
@@ -246,17 +259,20 @@ class ImportFilesController extends ControllerBase {
     // entity's id.
     $existing_media_entities = \Drupal::entityTypeManager()->getStorage('media')->loadByProperties(['field_easydb_uid' => $file_metadata['uid']]);
     // If there is already a media entity with this easydb UID, we delete the
-    // image file already before calling file_save_data(..., ..., FILE_EXISTS_RENAME)
-    // to prevent a file name extension like "_0" if it's not necessary.
+    // image file already before calling
+    // file_save_data(..., ..., FILE_EXISTS_RENAME) to prevent a file name
+    // extension like "_0" if it's not necessary.
     if ($existing_media_entities) {
       foreach ($existing_media_entities as $media_entity) {
-        if ($file = File::load($media_entity->field_media_image->target_id)) $file->delete();
+        if ($file = File::load($media_entity->field_media_image->target_id)) {
+          $file->delete();
+        }
       }
     }
     $file = file_save_data($file_data, $uri, FILE_EXISTS_RENAME);
     // Proceed only if saving the file was successful.
     if ($file === FALSE) {
-      $this->set_error(
+      $this->setError(
         $response_this_file,
         'error.drupal.file_save',
         $this->t('Couldn\'t save file in Drupal\'s file system.')
@@ -264,20 +280,22 @@ class ImportFilesController extends ControllerBase {
       return $response_this_file;
     }
     // Get the language_mapping from the easydb.settings config but the keys
-    // (Drupal langcodes) should be restricted to to the enabled languages
-    // (just in case a language once configured in the easydb settings was
-    // disabled in Drupal later).
+    // (Drupal langcodes) should be restricted to the enabled languages (just
+    // in case a language once configured in the easydb settings was disabled
+    // in Drupal later).
     $language_mapping = array_intersect_key(\Drupal::config('easydb.settings')->get('language_mapping'), \Drupal::languageManager()->getLanguages());
     // Remove languages with "don't create a translation..." setting.
     foreach ($language_mapping as $langcode => $easydb_langcode) {
-      if ($easydb_langcode == 'none') unset($language_mapping[$langcode]);
+      if ($easydb_langcode == 'none') {
+        unset($language_mapping[$langcode]);
+      }
     }
     // It's a fatal error if no Drupal language is mapped to any easydb
     // language because the following metadata import requires some basic
     // language decisions.
     if (empty($language_mapping)) {
       drupal_set_message($this->t('The easydb images couldn\'t be imported because no easydb language is mapped to this site\'s language(s). Please check the language mapping section on the <a href=":settings_url">easydb settings page</a>.', [':settings_url' => Url::fromRoute('easydb.settings')->toString()]), 'error');
-      $this->set_error(
+      $this->setError(
         $response_this_file,
         'error.drupal.language_mapping',
         $this->t('Couldn\'t import images because of missing language mapping.')
@@ -288,9 +306,9 @@ class ImportFilesController extends ControllerBase {
     // as an array keyed by langcode.
     $ent_values = [];
     foreach ($language_mapping as $langcode => $easydb_langcode) {
-      $ent_values[$langcode] = $this->metadata_mapping($file_metadata, $easydb_langcode) + [
+      $ent_values[$langcode] = $this->metadataMapping($file_metadata, $easydb_langcode) + [
         'langcode' => $langcode,
-        // Set a default name if name isn't set by metadata_mapping().
+        // Set a default name if name isn't set by metadataMapping().
         'name' => 'easydb image ' . $file->id(),
       ];
       $ent_values[$langcode]['field_media_image']['target_id'] = $file->id();
@@ -312,12 +330,14 @@ class ImportFilesController extends ControllerBase {
     if ($existing_media_entities) {
       // $existing_media_entities should contain only one (or no) entity.
       foreach ($existing_media_entities as $media_entity) {
-        if ($ent_values_onelang) {  // if easydb_image is not translatable
+        // If easydb_image is not translatable.
+        if ($ent_values_onelang) {
           foreach ($ent_values_onelang as $key => $value) {
             $media_entity->set($key, $value);
           }
         }
-        else {  // if easydb_image is translatable
+        // If easydb_image is translatable.
+        else {
           foreach ($ent_values as $langcode => $ent_values_current) {
             if ($media_entity->hasTranslation($langcode)) {
               // Update translation.
@@ -337,11 +357,14 @@ class ImportFilesController extends ControllerBase {
       }
       $response_this_file['action_taken'] = 'update';
     }
-    else {  // if there are no $existing_media_entities
-      if ($ent_values_onelang) {  // if easydb_image is not translatable
+    // If there are no $existing_media_entities.
+    else {
+      // If easydb_image is not translatable.
+      if ($ent_values_onelang) {
         $media_entity = Media::create($ent_values_onelang + ['bundle' => 'easydb_image']);
       }
-      else {  // if easydb_image is translatable
+      // If easydb_image is translatable.
+      else {
         $media_entity = Media::create(['bundle' => 'easydb_image']);
         foreach ($ent_values as $langcode => $ent_values_current) {
           $media_entity->addTranslation($langcode, $ent_values_current);
@@ -353,25 +376,31 @@ class ImportFilesController extends ControllerBase {
     }
     $response_this_file['url'] = file_create_url($file->getFileUri());
     // If there was no error, status is "done".
-    if (empty($response_this_file['status'])) $response_this_file['status'] = 'done';
+    if (empty($response_this_file['status'])) {
+      $response_this_file['status'] = 'done';
+    }
     return $response_this_file;
   }
 
   /**
-   * Returns the the appropriate string for a given key in the file metadata
-   * array if available.
+   * Returns the value for a given key in the file metadata array if available.
    *
    * Checks if the key exists, if it's a plain string or a multilingual array,
    * and returns the appropriate value, i.e. the value for the requested
    * language in case of a multilingual array, or the plain string otherwise.
    * If anything fails, @c FALSE is returned.
    *
-   * @param array $file_metadata The metadata received from easydb.
-   * @param array $easydb_langcode The (easydb) language code.
+   * @param array $file_metadata
+   *   The metadata received from easydb.
+   * @param string $key
+   *   The array key to look for.
+   * @param string $easydb_langcode
+   *   The (easydb) language code.
    *
-   * @return A string or @c FALSE.
+   * @return mixed
+   *   A string or @c FALSE.
    */
-  protected function metadata_mapping_single(array $file_metadata, $key, $easydb_langcode) {
+  protected function metadataMappingSingle(array $file_metadata, $key, $easydb_langcode) {
     if (array_key_exists($key, $file_metadata)) {
       if (is_array($file_metadata[$key])) {
         if (array_key_exists($easydb_langcode, $file_metadata[$key])) {
@@ -381,7 +410,8 @@ class ImportFilesController extends ControllerBase {
           return FALSE;
         }
       }
-      elseif (!empty($file_metadata[$key])) {  // $file_metadata[$key] is a string
+      // If $file_metadata[$key] is a string.
+      elseif (!empty($file_metadata[$key])) {
         return $file_metadata[$key];
       }
     }
@@ -391,8 +421,8 @@ class ImportFilesController extends ControllerBase {
   /**
    * Maps the metadata received from easydb to an entity values array.
    *
-   * First, the relevant data is copied to the @c $data array. It's values are
-   * @c FALSE or empty strings if they were not set in the file metadata.
+   * First, the relevant data is copied to the @c $data array. It's values
+   * are @c FALSE or empty strings if they were not set in the file metadata.
    *
    * Then, the return array is filled with the available values. The default
    * media entity's name and img title field is the title metadata if
@@ -400,28 +430,40 @@ class ImportFilesController extends ControllerBase {
    * The img alt field gets the same value if the "alternative" metadata field
    * is not available.
    *
-   * @param array $file_metadata The metadata received from easydb.
-   * @param array $easydb_langcode The (easydb) language code.
+   * @param array $file_metadata
+   *   The metadata received from easydb.
+   * @param string $easydb_langcode
+   *   The (easydb) language code.
    *
-   * @return An associative array with the following keys if the according data
-   * was given in the @c $file_metadata parameter: 'name', 'field_easydb_uid',
-   * 'field_easydb_title', 'field_easydb_description', 'field_easydb_caption',
-   * 'field_easydb_keywords', 'field_easydb_copyright', and 'field_media_image',
-   * an array with the keys 'alt' and 'title'.
+   * @return array
+   *   An associative array with the following keys if the according data was
+   *   given in the @c $file_metadata parameter: 'name', 'field_easydb_uid',
+   *   'field_easydb_title', 'field_easydb_description', 'field_easydb_caption',
+   *   'field_easydb_keywords', 'field_easydb_copyright', and
+   *   'field_media_image', an array with the keys 'alt' and 'title'.
    */
-  protected function metadata_mapping(array $file_metadata, $easydb_langcode) {
+  protected function metadataMapping(array $file_metadata, $easydb_langcode) {
     // Set $data from $file_metadata,
     // first for simple strings.
     foreach (['uid', 'filename'] as $key) {
       $data[$key] = (array_key_exists($key, $file_metadata) && !empty($file_metadata[$key])) ? $file_metadata[$key] : FALSE;
     }
     // Set $data for (possibly) multilingual fields.
-    foreach (['title', 'description', 'caption', 'alternative', 'keywords', 'copyright'] as $key) {
-      $data[$key] = $this->metadata_mapping_single($file_metadata, $key, $easydb_langcode);
+    foreach ([
+      'title',
+      'description',
+      'caption',
+      'alternative',
+      'keywords',
+      'copyright',
+    ] as $key) {
+      $data[$key] = $this->metadataMappingSingle($file_metadata, $key, $easydb_langcode);
     }
     // Set $name to the first available data from the list.
     foreach (['title', 'caption', 'alternative', 'filename'] as $key) {
-      if ($name = $data[$key]) break;
+      if ($name = $data[$key]) {
+        break;
+      }
     }
 
     // Fill the return array.
@@ -436,21 +478,29 @@ class ImportFilesController extends ControllerBase {
       $return['name'] = $name;
     }
     foreach (['uid', 'title', 'description', 'caption', 'keywords', 'copyright'] as $key) {
-      if ($data[$key]) $return['field_easydb_' . $key] = $data[$key];
+      if ($data[$key]) {
+        $return['field_easydb_' . $key] = $data[$key];
+      }
     }
     return $return;
   }
 
   /**
+   * Logs an error message.
+   *
    * Sends an error message to Drupal logger, drupal_set_message(), and the
    * response array.
    *
-   * @param array $response_this_file The current element of the response array.
-   * @param string $code The error code for easydb.
-   * @param string $description The error description for easydb and Drupal log.
-   * @param array $parameters The error parameters for easydb.
+   * @param array $response_this_file
+   *   The current element of the response array.
+   * @param string $code
+   *   The error code for easydb.
+   * @param string $description
+   *   The error description for easydb and Drupal log.
+   * @param array $parameters
+   *   The error parameters for easydb.
    */
-  protected function set_error(&$response_this_file, $code, $description, $parameters = NULL) {
+  protected function setError(array &$response_this_file, $code, $description, array $parameters = NULL) {
     \Drupal::logger('easydb')->error($description);
     drupal_set_message($description, 'error');
     $response_this_file['status'] = 'error';
@@ -458,7 +508,9 @@ class ImportFilesController extends ControllerBase {
       'code' => $code,
       'description' => $description,
     ];
-    if ($parameters) $response_this_file['error']['parameters'] = $parameters;
+    if ($parameters) {
+      $response_this_file['error']['parameters'] = $parameters;
+    }
   }
 
 }

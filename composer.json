@@ -1,0 +1,16 @@
+{
+  "name": "drupal/easydb",
+  "type": "drupal-module",
+  "description": "easydb File Picker: copy files from an easydb instance to Drupal.",
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/easydb",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/easydb",
+    "source": "http://cgit.drupalcode.org/easydb"
+  },
+  "require": {
+    "drupal/core": "~8.4",
+    "drupal/media": "~8.4",
+    "drupal/entity_browser": "~2.0"
+  }
+}

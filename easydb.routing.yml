@@ -10,7 +10,9 @@ easydb.import:
   path: '/easydb/import/{eb_uuid}'
   methods: [POST]
   defaults:
-    _controller: '\Drupal\easydb\Controller\ImportFilesController::handle_request'
+    _controller: '\Drupal\easydb\Controller\ImportFilesController::handleRequest'
   requirements:
+    # Access will be denied in ImportFilesController::handleRequest if eb_uuid
+    # is not a valid entity browser UUID from the user temp store.
     _access: 'TRUE'
     eb_uuid: '^[0-9a-f]+$'

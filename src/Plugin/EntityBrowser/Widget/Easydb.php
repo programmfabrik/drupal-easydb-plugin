@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\easydb\Plugin\EntityBrowser\Widget\Easydb.
- */
-
 namespace Drupal\easydb\Plugin\EntityBrowser\Widget;
 
 use Drupal\Core\Form\FormStateInterface;
